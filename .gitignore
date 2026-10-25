@@ -1,0 +1,7 @@
+.sage/
+.mamba/
+.micromamba/
+runs/
+__pycache__/
+*.pyc
+.DS_Store

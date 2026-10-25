@@ -28,7 +28,19 @@ if ($LASTEXITCODE -ne 0) {
 
 $wslPath = (wsl.exe wslpath -a "$root").Trim()
 Write-Host "Repo inside WSL: $wslPath"
-Write-Host "Running setup.sh (5-15 min, ~4 GB) ..."
+
+if ($wslPath -like "/mnt/*") {
+    Write-Host ""
+    Write-Host "WARNING: the repo is on a Windows drive (/mnt/...)." -ForegroundColor Yellow
+    Write-Host "The Sage environment will be slow there and can hit permission issues."
+    Write-Host "Recommended (inside the Ubuntu app):"
+    Write-Host "    cd ~"
+    Write-Host "    git clone https://github.com/vihan17/lnd-pipeline.git"
+    Write-Host "    cd lnd-pipeline && bash setup.sh"
+    Write-Host ""
+}
+
+Write-Host "Running setup.sh (10-15 min, ~4 GB) ..."
 
 wsl.exe -e bash -lc "cd '$wslPath' && bash setup.sh"
 if ($LASTEXITCODE -ne 0) {

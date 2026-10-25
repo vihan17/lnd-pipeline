@@ -1,7 +1,8 @@
 # LND pipeline (portable SageMath runner)
 
 Runs the LND / Maubach / van den Essen pipeline on **any machine with nothing
-pre-installed** — no Jupyter, no conda, no admin rights (on Linux/WSL).
+pre-installed** — no Jupyter, no conda. Linux/macOS need no admin rights;
+Windows needs Administrator **once** to enable WSL2.
 
 `setup.sh` downloads [micromamba](https://micro.mamba.pm) and installs a
 self-contained **SageMath 10.9** into `./.sage` (about 4 GB, 5–15 min).
@@ -40,29 +41,55 @@ python3 run.py --m 8 --r 5 --max-deg 60     # your target case
 python3 run.py --all                        # all cases in cases.json
 ```
 
-> **This repo is private.** On a fresh machine, `git clone` opens a GitHub
-> sign-in window (Git Credential Manager). If you cannot sign in there, ask for
-> the repo to be made public, or download the ZIP while signed in.
+> **Public repo** — `git clone` needs no GitHub login.
 >
 > On WSL, clone **inside the Linux home** (`cd ~`) rather than `/mnt/c/...`.
 > It is much faster and avoids permission quirks.
 
 ## Quick start (Windows + WSL2)
 
-1. Install [Git for Windows](https://git-scm.com/download/win) and WSL2
-   (`wsl --install -d Ubuntu` as Administrator, then reboot).
-2. Clone the repo (anywhere is fine, but WSL home is faster).
-3. In PowerShell, from the repo folder:
+SageMath has no native Windows build, so everything runs inside Ubuntu (WSL2).
+You need Administrator rights **once** to enable WSL2.
+
+### 1. Enable WSL2 (Administrator PowerShell, once)
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File setup.ps1
+wsl --install -d Ubuntu
 ```
 
-4. Run a case:
+Reboot, then open the **Ubuntu** app and create your Linux username/password.
+If `wsl --install` fails, enable virtualization (VT-x/AMD-V) in the BIOS, or
+ask the lab admin to enable the "Windows Subsystem for Linux" feature.
 
-```powershell
-wsl -e bash -lc "cd '/mnt/c/Users/<you>/lnd-pipeline' && python3 run.py --m 5 --r 3 --max-deg 10"
+### 2. Install everything inside Ubuntu (not PowerShell)
+
+```bash
+cd ~
+git clone https://github.com/vihan17/lnd-pipeline.git
+cd lnd-pipeline
+
+sudo apt update && sudo apt install -y git   # only if git is missing
+bash setup.sh                                 # 10-15 min, ~4 GB
+python3 run.py --m 5 --r 3 --max-deg 10       # smoke test
 ```
+
+### 3. Optional: give WSL more RAM
+
+WSL2 defaults to ~50% of RAM (~10 GB on a 20 GB PC). If the Gröbner stage needs
+more, create `C:\Users\<you>\.wslconfig`:
+
+```ini
+[wsl2]
+memory=14GB
+processors=8
+```
+
+Then run `wsl --shutdown` in PowerShell and reopen Ubuntu.
+
+> Already cloned on the Windows side (`C:\...`)? You can run
+> `powershell -ExecutionPolicy Bypass -File setup.ps1`; it calls `setup.sh`
+> through WSL. It works, but the Sage env then lives on `/mnt/c`, which is
+> noticeably slower than cloning inside `~`.
 
 ---
 
@@ -147,6 +174,10 @@ not the monomial enumeration.
 
 ## Colab fallback
 
-If the college PC cannot run WSL2 or install ~4 GB, open
-`notebooks/LND_colab_full.ipynb` in Google Colab (CPU runtime). It installs the
-same Sage 10.9 environment and runs the same cases.
+If the PC cannot run WSL2 (no admin rights) or cannot spare ~4 GB, open the
+notebook directly from this public repo:
+
+**https://colab.research.google.com/github/vihan17/lnd-pipeline/blob/main/notebooks/LND_colab_full.ipynb**
+
+Choose a **CPU** runtime, run the **Setup** cell once (5–15 min), then the case
+cells. It installs the same Sage 10.9 and runs the same pipeline.

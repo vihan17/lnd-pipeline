@@ -40,6 +40,10 @@ python3 run.py --m 8 --r 5 --max-deg 60     # your target case
 python3 run.py --all                        # all cases in cases.json
 ```
 
+> **This repo is private.** On a fresh machine, `git clone` opens a GitHub
+> sign-in window (Git Credential Manager). If you cannot sign in there, ask for
+> the repo to be made public, or download the ZIP while signed in.
+>
 > On WSL, clone **inside the Linux home** (`cd ~`) rather than `/mnt/c/...`.
 > It is much faster and avoids permission quirks.
 
@@ -77,6 +81,14 @@ Options:
 - `--q X,Y` — variables for `Q_list` (default `X`; use `--q ""` for none)
 - `--sage PATH` — use an existing Sage instead of `./.sage/bin/sage`
 - `--stop-on-error` — stop `--all` at the first non-zero exit
+
+Want the notebook UI? After setup:
+
+```bash
+./.sage/bin/sage -n jupyter --no-browser
+```
+
+Open the printed URL and pick `notebooks/LND.ipynb` (Sage 10.9 kernel).
 
 ## Outputs
 
@@ -118,8 +130,13 @@ not the monomial enumeration.
 ## Notes / troubleshooting
 
 - **`SageMath not found`** → run `bash setup.sh` first.
+- **WSL: `Could not resolve host`** → run `wsl --shutdown` in PowerShell, reopen
+  WSL and retry. WSL networking occasionally loses DNS after sleep.
+- **Windows without Administrator rights** → WSL2 cannot be enabled; use the
+  Colab notebook instead (`notebooks/LND_colab_full.ipynb`).
 - **Micromamba download fails** → check the network/proxy; the URL is
-  `https://micro.mamba.pm/api/micromamba/linux-64/latest`.
+  `https://micro.mamba.pm/api/micromamba/linux-64/latest` (7 MB), after which
+  conda-forge packages (~1.5 GB download, ~4 GB installed) are fetched.
 - **Disk full** → the env needs ~4 GB; remove `.sage` and re-run setup.
 - **`OSError: [Errno 28]` or killed process** → out of memory; close other apps
   or run a smaller `max_deg`.
